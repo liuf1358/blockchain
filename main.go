@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/satori/go.uuid"
 	"strings"
-	. "./core"
+	 "blockchain/core"
 	"time"
 	"net/http"
 	"log"
@@ -13,18 +13,18 @@ import (
 type Response struct {
 	Message      string        `json:"message"`
 	Index        int           `json:"index"`
-	Transaction  []Transaction `json:"transaction"`
+	Transaction  []core.Transaction `json:"transaction"`
 	Proof        int           `json:"proof"`
 	PreviousHash string        `json:"previousHash"`
-	Chain        []Block       `json:"chain,omitempty"`
-	NewChain     []Block       `json:"newChain,omitempty"`
+	Chain        []core.Block       `json:"chain,omitempty"`
+	NewChain     []core.Block       `json:"newChain,omitempty"`
 	TotalNodes   []interface{} `json:"totalNodes,omitempty"`
 }
 
-var ud, _ = uuid.NewV1()
+var ud = uuid.NewV1()
 var nodeIdentifier = strings.Replace(ud.String(), "-", "", -1)
 
-var blockchain *Blockchain
+var blockchain *core.Blockchain
 
 func mine(w http.ResponseWriter, r *http.Request) {
 	lastBlock := blockchain.LastBlock()
@@ -33,7 +33,7 @@ func mine(w http.ResponseWriter, r *http.Request) {
 	blockchain.NewTransaction("0", nodeIdentifier, 1)
 
 	// Forge the new Block by adding it to the chain
-	previousHash := Hash(lastBlock)
+	previousHash :=core. Hash(lastBlock)
 	block := blockchain.NewBlock(proof, previousHash)
 
 	response := Response{Message: "New Block Forged",
@@ -53,7 +53,7 @@ func NewTransaction(sender string, recipient string, amount int) *Response {
 }
 
 func fullChain(w http.ResponseWriter, r *http.Request) {
-	chain := new(Chain)
+	chain := new(core.Chain)
 	chain.Chain = blockchain.Chain
 	chain.Length = len(blockchain.Chain)
 
